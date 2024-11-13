@@ -14,12 +14,18 @@ const urlFor = (source: SanityImageSource) =>
 
 const options = { next: { revalidate: 30 } };
 
-type PostPageProps = {
-  params: { slug: string };
-};
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  // Resolve the params promise
+  const resolvedParams = await params;
 
-export default async function PostPage({ params }: PostPageProps) {
-  const post = await client.fetch<SanityDocument>(POST_QUERY, params, options);
+  // Use the resolved params to fetch the post data
+  const post = await client.fetch<SanityDocument>(POST_QUERY, resolvedParams, options);
+
+  // Handle post image URL
   const postImageUrl = post.image
     ? urlFor(post.image)?.width(550).height(310).url()
     : null;
